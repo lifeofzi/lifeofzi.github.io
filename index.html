@@ -8,12 +8,16 @@
 
 <script type="application/processing" data-processing-target="pjs">   
 
+
+  
+
 PImage img;
 PGraphics mask;
-PFont Font1,Font2;
+PFont Font1, Font2;
 
 int incrx=200, incry=200;
-Ball[] balls = new Ball[35000];
+int padd=300;
+Ball[] balls = new Ball[350000];
 int howMany = 2300;
 float[] x = new float[howMany];
 float[] y = new float[howMany];
@@ -24,150 +28,238 @@ float Y=height/2;
 float fade;
 int textsize=19;
 boolean notClicked=true;
-
-
+float heightOfWindow, widthOfWindow;
+int buttonsizex=150;
+int buttonsizey=50;
+boolean storybuttonClicked=false;
+boolean resumebuttonClicked=false;
+boolean firstTime=true;
+int b=0;
 void setup() {
 
   size( $(window).width(), $(window).height() );
+  widthOfWindow=$(window).width(); 
+  heightOfWindow=$(window).height();
   img = loadImage("sometimes-happy-5.png");
   background(255);
   noStroke();
   smooth();
-  for (int i=0; i<howMany; i++) {
-    x[i] = random(0, $(window).width());
-    y[i] =random(0, $(window).height());
-    speed[i] = random(1, 5);
-  }
+  initializeRain();
   t = new TextManager();
-  textSize(random(10,20));
+  textSize(random(10, 20));
   textAlign(CENTER, CENTER);
-  frameRate(30);
-  fill(255, 15);
-  rect(0, 0, width, height);
-  
-  fill(random(0,255), 102, 153);
-  Font2 = createFont("LetterGothicStd.ttf", 23);
+  frameRate(60);
+  background(255);
+  fill(random(0, 255), 102, 153);
+  Font2 = createFont("Arial", 23);
   textFont(Font2);
-  text(" Hello there , let me tell you a story.",$(window).width()/2,$(window).height()/2);
-  textSize(15);
-  text("  \n\n\n Move the mouse around for the story... \n Click on the picture in the center for more..",$(window).width()/2,$(window).height()/2 + 10);
-  
-
-
+  text("Hi", widthOfWindow/2, heightOfWindow/2+padd/8);
+  createStoryButton(widthOfWindow/2-padd, heightOfWindow/2);
+  createResumeButton(widthOfWindow/2+padd, heightOfWindow/2);
+  imageMode(CENTER);
+  image(img, widthOfWindow/2, heightOfWindow/3);
 }
 
 
 void draw() {
-  
-  
-  if(notClicked)
-  {
-    //Story Block
-  if (overimage())
-  {
-    image(img, $(window).width()/2-img.width/2, $(window).height()/2-img.height/2);
-  }
-  
-  if (mouseY > 0 && mouseY < $(window).height() && mouseX > 0 && mouseX < $(window).width()  && !overimage() && isMouseMoving(X,Y)) {
+
+  if (!storybuttonClicked)
+    StoryButton(widthOfWindow/2-padd, heightOfWindow/2);
+  if (!resumebuttonClicked)
+    ResumeButton(widthOfWindow/2+padd, heightOfWindow/2);
+
+  if(firstTime){
     wherevermouseis();
-    fill(255, 15);
-     rect(0, 0, width, height);
-    paintWordAtPoint(mouseX, mouseY);
-     X=mouseX;
-    Y=mouseY;
-
+    wherevermouseis();
   }
 
-  
-    
-  
-  
-  }
-  else
+  if (storybuttonClicked)
   {
-    //Brief Resume Here
-    int safety=30;
-    fill(255, 100);
-    rect(0, 0, width, height);
+    wherevermouseis2();
+    firstTime=false;
+    if (mouseY > 0 && mouseY < heightOfWindow && mouseX > 0 && mouseX < widthOfWindow && isMouseMoving(X, Y)) {
+      
+      fill(255, 15);
+      rectMode(NORMAL);
+      rect(0, 0, widthOfWindow, heightOfWindow);
+      paintWordAtPoint(mouseX, mouseY);
+      X=mouseX;
+      Y=mouseY;
+    }
+    createResumeButton(widthOfWindow-padd/3, padd/8);
+    if (!resumebuttonClicked)
+      ResumeButton(widthOfWindow-padd/3, padd/8);
+  }
+
+  if (resumebuttonClicked)
+  {
+    firstTime=false;
+    fill(255, 23);
+    
+    rectMode(NORMAL);
+    rect(0, 0, widthOfWindow, heightOfWindow);
     wherevermouseis();
     calltheRain();
-    imageMode(CENTER);
-    image(img, $(window).width()-img.width-safety, $(window).height()/2);
-    fill(0);
-    Font2 = createFont("LetterGothicStd.ttf", 23);
-    textSize(13);
-    text("Email : zi10@iitbbs.ac.in \n zaman.ishtiyaq@gmail.com" ,$(window).width()-img.width-safety, $(window).height()/2+img.height/2+safety);
-    
-
+    createStoryButton(padd/3, padd/8);
+    BuildResume();
+    if (!storybuttonClicked) {
+      StoryButton(padd/3, padd/8);
+    }
   }
 }
 
 
 void paintWordAtPoint(int locX, int locY) {
 
-  float offX = random(5,14), offY = random(5,14);
-  Font1 = createFont("andalemo.ttf",random(textsize,textsize+5));
+  float offX = random(5, 14), offY = random(5, 14);
+  Font1 = createFont("Arial", random(textsize, textsize+5));
   textFont(Font1);
-  fill(random(0,255), 102, 153);
+  fill(random(0, 255), 102, 153);
   text(t.getWord(), locX + offX, locY + offY);
-
 }
 
 
 //FUNCTIONS --------------
 
-
-void mousePressed() {
-  if(overimage())
-  {
-    notClicked=!notClicked;
-  }
-
+void createStoryButton(float X, float Y) {
+  fill(245, 102, 153);
+  rectMode(CENTER);
+  rect(X, Y, buttonsizex, buttonsizey);
+  fill(255);
+  rect(X, Y, buttonsizex-10, buttonsizey-10);
+  Font2 = createFont("Arial", 15);
+  textFont(Font2);
+  textMode(CENTER);
+  fill(153, 102, 153);
+  text("Story Mode", X, Y);
 }
 
-boolean overimage() {
-  if (mouseX<img.width/2+$(window).width()/2 && mouseX>$(window).width()/2-img.width/2 && mouseY>$(window).height()/2-img.height/2 && mouseY<$(window).height()/2+img.height/2  )
-    return true;
-  else return false;
+void createResumeButton(float X, float Y) {
+  fill(124, 102, 153);
+  rectMode(CENTER);
+  rect(X, Y, buttonsizex, buttonsizey);
+  fill(255);
+  rect(X, Y, buttonsizex-10, buttonsizey-10);
+  Font2 = createFont("Arial", 15);
+  textFont(Font2);
+  textMode(CENTER);
+  fill(154, 102, 153);
+  text("Resume", X, Y);
+}
+
+
+void StoryButton(float X, float Y) {
+  float cenx_loc=X;
+  float ceny_loc=Y;
+  if (mousePressed && mouseX<cenx_loc+buttonsizex/2 && mouseX>cenx_loc-buttonsizex/2 && mouseY<ceny_loc+buttonsizey/2 && mouseY>ceny_loc-buttonsizey/2)
+  { 
+    storybuttonClicked=!storybuttonClicked;
+    background(255);
+    resumebuttonClicked=false;
+  }
+}
+
+void ResumeButton(float X, float Y) {
+  float cenx_loc=X;
+  float ceny_loc=Y;
+  if (mousePressed && mouseX<cenx_loc+buttonsizex/2 && mouseX>cenx_loc-buttonsizex/2 && mouseY<ceny_loc+buttonsizey/2 && mouseY>ceny_loc-buttonsizey/2)
+  {
+    resumebuttonClicked=!resumebuttonClicked;
+    storybuttonClicked=false;
+  }
+}
+
+
+void pictureMix()
+{
+  for (int i =0; i<10000; i++) {
+    img.loadPixels();
+    int x = int(random(img.width));
+    int y = int(random(img.height));
+    int loc = x + y*img.width;
+    color c = img.pixels[loc];
+    balls[i]=new Ball(c);
+    balls[i].displayBall(width/2-img.width/2, height/2-img.height/2);
+  }
+}
+
+
+void mousePressed() {
 }
 
 void wherevermouseis() {
   stroke(random(150, 200), random(150, 200), random(0, 255), 100);
-   line(mouseX, mouseY, pmouseX, pmouseY);
+  line(mouseX, mouseY, pmouseX, pmouseY);
   line(mouseY, mouseX, pmouseY, pmouseX);
-  line(mouseY+random(-10,10), mouseX+random(-10,10), pmouseY+random(-10,10), pmouseX+random(-10,10));
-  line(mouseX+random(-10,10), mouseY+random(-10,10), pmouseX+random(-10,10), pmouseY+random(-10,10));
-  line(mouseY+random(-20,10), mouseX+random(-20,20), pmouseY+random(-20,20), pmouseX+random(-20,10));
-  line(mouseX+random(-20,20), mouseY+random(-20,20), pmouseX+random(-20,20), pmouseY+random(-20,10));
+  line(mouseY+random(-10, 10), mouseX+random(-10, 10), pmouseY+random(-10, 10), pmouseX+random(-10, 10));
+  line(mouseX+random(-10, 10), mouseY+random(-10, 10), pmouseX+random(-10, 10), pmouseY+random(-10, 10));
+  line(mouseY+random(-20, 10), mouseX+random(-20, 20), pmouseY+random(-20, 20), pmouseX+random(-20, 10));
+  line(mouseX+random(-20, 20), mouseY+random(-20, 20), pmouseX+random(-20, 20), pmouseY+random(-20, 10));
   noStroke();
   fill(random(150, 200), random(150, 200), random(0, 255), 100);
-  ellipse(mouseX+random(-40,40), mouseY+random(-40,40),random(-10,10),random(-10,10));
-  ellipse(mouseY+random(-40,40), mouseX+random(-40,40),random(-10,10),random(-10,10));
-  ellipse(pmouseY+random(-40,40), pmouseX+random(-40,40),random(-10,10),random(-10,10));
-
+  ellipse(mouseX+random(-40, 40), mouseY+random(-40, 40), random(-10, 10), random(-10, 10));
+  ellipse(mouseY+random(-40, 40), mouseX+random(-40, 40), random(-10, 10), random(-10, 10));
+  ellipse(pmouseY+random(-40, 40), pmouseX+random(-40, 40), random(-10, 10), random(-10, 10));
+  ellipse(pmouseY+random(-40, 20), pmouseX+random(-40, 40), random(-10, 10), random(-10, 10));
+  ellipse(pmouseY+random(-40, 40), pmouseX+random(-40, 40), random(-10, 10), random(-10, 10));
 }
 
+void wherevermouseis2() {
+  stroke(random(100, 200), random(100, 200), random(50, 255), 40);
+  line(mouseX, mouseY, pmouseX, pmouseY);
+  line(mouseX+random(-10, 10), mouseY+random(-10, 10), pmouseX+random(-10, 10), pmouseY+random(-10, 10));
+  line(mouseX+random(-20, 20), mouseY+random(-20, 20), pmouseX+random(-20, 20), pmouseY+random(-20, 10));
+
+  noStroke();
+  fill(random(150, 200), random(150, 200), random(0, 255), 100);
+  ellipse(mouseX+random(-40, 40), mouseY+random(-40, 40), random(-10, 10), random(-10, 10));
+}
 
 boolean isMouseMoving(float X, float Y)
 {
-  
-  float d=dist(mouseX,mouseY,X,Y);
-  if(d>50)
+
+  float d=dist(mouseX, mouseY, X, Y);
+  if (d>70)
     return true;
   else return false;
-
 }
 
 void calltheRain() {
   for (int i=0; i<howMany; i++) {
     noStroke();
-    fill(0,30*speed[i], 70*speed[i],30);
+    fill(145, 30*speed[i], 70*speed[i], 30);
     ellipse(x[i], y[i], speed[i], speed[i]);
     y[i] += speed[i]/2;
     if (y[i] > height) 
       y[i] = 0;
   }
 }
+
+void initializeRain() {
+  for (int i=0; i<howMany; i++) {
+    x[i] = random(0, widthOfWindow);
+    y[i] =random(0, heightOfWindow);
+    speed[i] = random(1, 5);
+  }
+}
+
+void BuildResume() {
+  //Your Resume Here
+  imageMode(CENTER);
+  image(img, widthOfWindow-img.width/2-padd/4, heightOfWindow/3-padd/4);
+  
+  
+
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -181,29 +273,27 @@ class Ball {
   color c;
 
   Ball() {                    //overloading
-    x=random(0,$(window).width());
-    y=random(0,$(window).height());
-    xspeed=random(0,3);
-    yspeed=random(0,4);
-    diameter=random(24,50);
+    x=random(0, widthOfWindow);
+    y=random(0, heightOfWindow);
+    xspeed=random(0, 3);
+    yspeed=random(0, 4);
+    diameter=random(24, 50);
     t=true;
     c=color(0);
-    
   }
 
-Ball(color col) {                    //overloading
-    x=random(0,$(window).width());
-    y=random(0,$(window).height());
-    xspeed=random(0,3);
-    yspeed=random(0,4);
+  Ball(color col) {                    //overloading
+    x=random(0, widthOfWindow);
+    y=random(0, heightOfWindow);
+    xspeed=random(0, 3);
+    yspeed=random(0, 4);
     t=true;
     c=color(col);
-    
   }
   void displayBall(int x, int y) {
     noStroke();
     fill(c);
-    ellipse(x, y, 3, 3);
+    ellipse(x, y, 40, 40);
   }
 
   void moveBall() {
@@ -212,18 +302,14 @@ Ball(color col) {                    //overloading
   }
 
   void checkEdges() {
-    if (x>$(window).width() || x<0)
+    if (x>widthOfWindow || x<0)
       xspeed=xspeed*-1;
-    if (y>$(window).height() || y<0)
+    if (y>heightOfWindow || y<0)
       yspeed=yspeed*-1;
   }
   void pop() {
     t=!t;
   }
-
-  
-    
-  
 };
 
 class TextManager {
@@ -237,7 +323,7 @@ class TextManager {
 
   TextManager() {
     w = defaultText;
-    words = splitTokens(w,SPLIT_TOKENS);
+    words = splitTokens(w, SPLIT_TOKENS);
   }
 
   TextManager(String wInput) {
@@ -257,16 +343,7 @@ class TextManager {
     wordIndex = (wordIndex + 1) % words.length;
     return word;
   }
-
 }
-
-
-
-
-
-
-
-
 
 
 
