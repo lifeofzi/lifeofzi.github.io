@@ -5,15 +5,14 @@
  <script src=" https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script> 
   <script src="processing.js" type="text/javascript"></script> 
 <script type="application/processing" data-processing-target="pjs">   
-
+/* @pjs preload="sometimes-happy-5.png"; 
+  @pjs preload="SummerLove.otf"; @pjs preload="Budidaya Regular.otf";
+*/
 PImage img;
 PGraphics mask;
 PFont Font1, Font2;
-
-int incrx=200, incry=200;
 int padd=300;
-Ball[] balls = new Ball[350000];
-int howMany = 2300;
+int howMany = 10000;
 float[] x = new float[howMany];
 float[] y = new float[howMany];
 float[] speed = new float[howMany];
@@ -23,7 +22,7 @@ float Y=height/2;
 float L=width/2;
 float S=height/2;
 float fade;
-int textsize=19;
+int textsize=23;
 boolean notClicked=true;
 float heightOfWindow, widthOfWindow;
 int buttonsizex=150;
@@ -32,6 +31,11 @@ boolean storybuttonClicked=false;
 boolean resumebuttonClicked=false;
 boolean firstTime=true;
 int b=0;
+PFont Fonttitle;
+PFont Fonttext;
+PFont StoryFont;
+
+
 void setup() {
 
   size( $(window).width(), $(window).height() );
@@ -40,8 +44,10 @@ void setup() {
   // size( displayWidth, displayHeight);
   // widthOfWindow=displayWidth; 
   // heightOfWindow=displayHeight;
-
   img = loadImage("sometimes-happy-5.png");
+ Fonttitle = createFont("SummerLove.otf",38);
+ Fonttext = createFont("Comic Sans",13);
+ StoryFont=createFont("Budidaya Regular.otf",13);
   background(255);
   noStroke();
   smooth();
@@ -77,7 +83,7 @@ void draw() {
     wherevermouseis2();
     if (mouseY > 0 && mouseY < heightOfWindow && mouseX > 0 && mouseX < widthOfWindow && isMouseMoving(X, Y, 70)) {
 
-      fill(255, 10);
+      fill(255, 20);
       rectMode(NORMAL);
       rect(0, 0, widthOfWindow, heightOfWindow);
       paintWordAtPoint(mouseX, mouseY);
@@ -91,12 +97,13 @@ void draw() {
 
   if (resumebuttonClicked)
   {
+    
+    background(0);
     firstTime=false;
     fill(255, 23);
 
     rectMode(NORMAL);
     rect(0, 0, widthOfWindow, heightOfWindow);
-    wherevermouseis();
     calltheRain();
     createStoryButton(padd/3, padd/8);
     BuildResume();
@@ -110,8 +117,8 @@ void draw() {
 void paintWordAtPoint(int locX, int locY) {
 
   float offX = random(5, 14), offY = random(5, 14);
-  Font1 = createFont("Arial", random(textsize, textsize+5));
-  textFont(Font1);
+  textFont(StoryFont);
+  textSize(random(textsize, textsize+7));
   fill(random(0, 255), 102, 153);
   text(t.getWord(), locX + offX, locY + offY);
 }
@@ -130,6 +137,21 @@ void createStoryButton(float X, float Y) {
   textMode(CENTER);
   fill(153, 102, 153);
   text("Story Mode", X, Y);
+
+  if (onButton(X, Y))
+  {
+    fill(200, 102, 153);
+    rectMode(CENTER);
+    rect(X, Y, buttonsizex, buttonsizey);
+    fill(230);
+    rect(X, Y, buttonsizex-10, buttonsizey-10);
+    Font2 = createFont("Arial", 16);
+    textFont(Font2);
+    textMode(CENTER);
+    fill(154, 102, 153);
+    text("Story Mode", X, Y);
+  }
+  //IF ON IT ANIMATE
 }
 
 void createResumeButton(float X, float Y) {
@@ -143,8 +165,29 @@ void createResumeButton(float X, float Y) {
   textMode(CENTER);
   fill(154, 102, 153);
   text("Resume", X, Y);
+
+  //IF ON IT ANIMATE
+  if (onButton(X, Y))
+  {
+    fill(200, 102, 153);
+    rectMode(CENTER);
+    rect(X, Y, buttonsizex, buttonsizey);
+    fill(230);
+    rect(X, Y, buttonsizex-10, buttonsizey-10);
+    Font2 = createFont("Arial", 16);
+    textFont(Font2);
+    textMode(CENTER);
+    fill(154, 102, 153);
+    text("Resume", X, Y);
+  }
 }
 
+boolean onButton(float X, float Y)
+{
+  if (mouseX<X+buttonsizex/2 && mouseX>X-buttonsizex/2 && mouseY<Y+buttonsizey/2 && mouseY>Y-buttonsizey/2)
+    return true;
+  return false;
+}
 
 void StoryButton(float X, float Y) {
   float cenx_loc=X;
@@ -222,8 +265,10 @@ boolean isMouseMoving(float X, float Y, float D)
 void calltheRain() {
   for (int i=0; i<howMany; i++) {
     noStroke();
-    fill(145, 30*speed[i], 70*speed[i], 30);
-    ellipse(x[i], y[i], speed[i], speed[i]);
+    //fill(145, 30*speed[i], 70*speed[i], 30);
+    fill(50*speed[i]);
+    ellipseMode(CENTER);
+    ellipse(x[i], y[i], speed[i]-1, speed[i]);
     y[i] += speed[i]/2;
     if (y[i] > height) 
       y[i] = 0;
@@ -232,16 +277,32 @@ void calltheRain() {
 
 void initializeRain() {
   for (int i=0; i<howMany; i++) {
-    x[i] = random(0, widthOfWindow);
-    y[i] =random(0, heightOfWindow);
+    x[i] = random(-widthOfWindow, widthOfWindow);
+    y[i] =random(-heightOfWindow, heightOfWindow);
     speed[i] = random(1, 5);
   }
 }
 
 void BuildResume() {
+  int gap = 20;
   //Your Resume Here
   imageMode(CENTER);
   image(img, widthOfWindow-img.width/2-padd/4, heightOfWindow/3-padd/4);
+  Badge b1= new Badge(widthOfWindow/6, heightOfWindow/4, 440, 170, color(200, 102, 153), "Academics","IIT Bhubaneswar \n B.Tech (Computer Science and Engineering)               9.14*/10 \n (currently in 4th semester)               *at the end of 3rd semester" , 14);
+  b1.displayBadge();
+  b1.badgeAnimation();
+  Badge b2= new Badge(widthOfWindow/6, heightOfWindow/2 + gap, 440, 170, color(0), "Skills","• Programming languages – C, C++, Java, JS. \n •  Processing, OpenCV(Basics) , Git , Matlab \n •  Adobe Photoshop, Lightroom, Illustrator, After Effects" , 14);
+  b2.displayBadge();
+  b2.badgeAnimation();
+  Badge b3= new Badge(widthOfWindow/2+gap/3, heightOfWindow/2 + gap, 440, 170, color(0), "Interests"," •  Computer Vision and Computational Photography. \n •  Image Processing and UI/UX Design" , 14);
+  b3.displayBadge();
+  b3.badgeAnimation();
+  Badge b4= new Badge(widthOfWindow/6, (3*heightOfWindow)/4 + 2*gap, 440, 170, color(0), "Extra Curriculars"," •  Former Secretary of the Photography Society of IIT Bhubaneswar. \n •  Student Counsellor for Counselling Service Team IIT Bhubaneswar \n •  Member of Cinewave, the Cinematics Society of IIT Bhubaneswar. \n •  Member of Alumni Cell IIT Bhubaneswar. \n •  Member of football team at IIT Bhubaneswar." , 14);
+  b4.displayBadge();
+  b4.badgeAnimation();
+  Badge b5= new Badge(widthOfWindow/2+gap/3, (3*heightOfWindow)/4 + 2*gap, 440, 170, color(0), "Contact","•  Email: zi10@iitbbs.ac.in. \n •  Ph: 9078814370 \n" , 14);
+  b5.displayBadge();
+  b5.badgeAnimation();
 }
 
 void loadStart()
@@ -263,54 +324,7 @@ void loadStart()
 }
 
 
-class Ball {
-  float x;
-  float y;
-  float xspeed;
-  float yspeed;
-  boolean t;
-  float diameter;
-  color c;
 
-  Ball() {                    //overloading
-    x=random(0, widthOfWindow);
-    y=random(0, heightOfWindow);
-    xspeed=random(0, 3);
-    yspeed=random(0, 4);
-    diameter=random(24, 50);
-    t=true;
-    c=color(0);
-  }
-
-  Ball(color col) {                    //overloading
-    x=random(0, widthOfWindow);
-    y=random(0, heightOfWindow);
-    xspeed=random(0, 3);
-    yspeed=random(0, 4);
-    t=true;
-    c=color(col);
-  }
-  void displayBall(int x, int y) {
-    noStroke();
-    fill(c);
-    ellipse(x, y, 40, 40);
-  }
-
-  void moveBall() {
-    x=x+xspeed;
-    y=y+yspeed;
-  }
-
-  void checkEdges() {
-    if (x>widthOfWindow || x<0)
-      xspeed=xspeed*-1;
-    if (y>heightOfWindow || y<0)
-      yspeed=yspeed*-1;
-  }
-  void pop() {
-    t=!t;
-  }
-};
 
 class TextManager {
 
@@ -342,6 +356,61 @@ class TextManager {
     String word = words[wordIndex];
     wordIndex = (wordIndex + 1) % words.length;
     return word;
+  }
+}
+class Badge {
+  float X;
+  float Y;
+  float xsize;
+  float ysize;
+  color c;
+  String str;
+  float textsize;
+  String title;
+  float titlepad=10;
+
+  Badge(float tempX, float tempY, float tempxsize, float tempysize, color tempc, String temptitle,String tempstr,  float temptextsize) {
+    X=tempX;
+    Y=tempY;
+    xsize=tempxsize;
+    ysize=tempysize;
+    c=tempc;
+    str=tempstr;
+    textsize=temptextsize;
+    title=temptitle;
+
+  }
+
+  void displayBadge()
+  {
+    rectMode(CENTER);
+    fill(255,14);
+    rect(X, Y, xsize, ysize);
+    fill(255);
+    textFont(Fonttitle);
+     
+    text(title, X, Y);
+  }
+
+  void badgeAnimation() {
+    if (overBadge())
+    {
+      rectMode(CENTER);
+      fill(255);
+      rect(X, Y, xsize, ysize);
+   
+      
+      textFont(Fonttext);
+      textSize(13);
+      fill(0);
+      text(str, X, Y);
+    }
+  }
+  boolean overBadge()
+  {
+    if (mouseX<=X+xsize/2 && mouseX>=X-xsize/2 && mouseY>=Y-ysize/2 && mouseY<=Y+ysize/2)
+      return true;
+    else return false;
   }
 }
 
