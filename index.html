@@ -34,6 +34,7 @@ int b=0;
 PFont Fonttitle;
 PFont Fonttext;
 PFont StoryFont;
+PFont Font3;
 
 
 void setup() {
@@ -45,9 +46,9 @@ void setup() {
   // widthOfWindow=displayWidth; 
   // heightOfWindow=displayHeight;
   img = loadImage("sometimes-happy-5.png");
- Fonttitle = createFont("SummerLove.otf",38);
+ Fonttitle = createFont("Comic Sans Light",38);
  Fonttext = createFont("Comic Sans",13);
- StoryFont=createFont("Budidaya Regular.otf",13);
+ StoryFont=createFont("Comic Sans",13);
   background(255);
   noStroke();
   smooth();
@@ -57,6 +58,19 @@ void setup() {
   textAlign(CENTER, CENTER);
   frameRate(60);
   background(255);
+  fill(20, 102, 153);    
+  Font2 = createFont("Comic Sans Bold", 20); 
+  textFont(Font2);
+  text("\nHi there, welcome to my site. \n Choose any Option..", widthOfWindow/2, heightOfWindow/2+padd/8);                     // CHANGING COLORS HERE <<<-------------------------------------
+   fill(168, 102, 153); 
+  Font3= createFont("Comic Sans Italic", 13);
+  textFont(Font3);
+  text("\n\n\n\n\n\n\n\nThis page is a processing 3.0 sketch", widthOfWindow/2, heightOfWindow/2+padd/8);
+  fill(20, 102, 153);
+  Font3= createFont("Comic Sans", 13);
+  textFont(Font3);
+  text("\n\n\n\n\n\n\n\n zi10 [at] iitbbs.ac.in", widthOfWindow/2, heightOfWindow/2+padd/5);
+
 }
 
 
@@ -73,10 +87,17 @@ void draw() {
 
   if (storybuttonClicked)
   {
+
     if (firstTime) {
+      
       fill(255);
       rectMode(NORMAL);
       rect(0, 0, widthOfWindow, heightOfWindow);
+      textFont(Font2);
+      textMode(CENTER);
+      fill(153, 102, 153);
+      text("Move the mouse arround ..", widthOfWindow/2, heightOfWindow-padd/2);
+      
     }
     firstTime=false;
     wherevermouseis2();
@@ -89,6 +110,7 @@ void draw() {
       paintWordAtPoint(mouseX, mouseY);
       X=mouseX;
       Y=mouseY;
+
     }
     createResumeButton(widthOfWindow-padd/3, padd/8);
     if (!resumebuttonClicked)
@@ -303,6 +325,9 @@ void BuildResume() {
   Badge b5= new Badge(widthOfWindow/2+2*gap, (3*heightOfWindow)/4 + gap, widthOfWindow/2.9, heightOfWindow/4.41, color(0), "Contact","•  Email: zi10@iitbbs.ac.in. \n •  Ph: 9078814370 \n" , 14);
   b5.displayBadge();
   b5.badgeAnimation();
+  Badge b6= new Badge(4*widthOfWindow/5 + 3*gap, heightOfWindow/2, widthOfWindow/4, heightOfWindow/10, color(0), ""," Zaman Ishtiyaq" , 14);
+  b6.displayBadge();
+  b6.badgeAnimation();
 }
 
 void loadStart()
@@ -317,10 +342,7 @@ void loadStart()
   createResumeButton(widthOfWindow/2+padd, heightOfWindow/2);
   imageMode(CENTER);
   image(img, widthOfWindow/2, heightOfWindow/3);
-  fill(random(0, 255), 102, 153);                          // CHANGING COLORS HERE <<<-------------------------------------
-  Font2 = createFont("Arial", 23);
-  textFont(Font2);
-  text("Hi", widthOfWindow/2, heightOfWindow/2+padd/8);
+  
 }
 
 
@@ -329,7 +351,7 @@ void loadStart()
 class TextManager {
 
   String w = "";
-  String defaultText = "Zaman Ishtiyaq was born on 16th of July 1995, he does not remember it but that is what people say. He spent his early childhood in Srinagar, Jammu and Kashmir. His parents moved to New Delhi during his teenage and so did he. Zaman completed his matriculation from Green Fields School, New Delhi securing a 10/10 CGPA, yes he was,no is a bright child. After his matriculation his parents again moved back to Srinagar and he completed his secondary education from Army public School, Srinagar with excellent grades. Zaman joined IIT Bhubaneswar a year later and is now busy writing this. He is currently a second year Undergraduate Student and is majoring in Computer Science and Engineering. He likes to study Image Processing and Computer Vision. He is also a very active photographer, likes to play football a lot, read books, poetry and make short films once in a while. He is very fond of Mountaineering, Trekking, Mountain Biking, Skiing, Design, Reading Books and Skateboarding and is trying competitive swimming right now. That's is for today,     And Let's Repeat ...";
+  String defaultText = "Zaman Ishtiyaq was born on 16th of July 1995, he does not remember it but that is what people say. He spent his early childhood in Srinagar, Jammu and Kashmir. His parents moved to New Delhi during his teenage and so did he. Zaman completed his matriculation from Green Fields School, New Delhi securing a 10/10 CGPA, yes he was,no is a bright child. After his matriculation his parents again moved back to Srinagar and he completed his secondary education from Army public School, Srinagar with excellent grades. Zaman joined IIT Bhubaneswar a year later and is now busy writing this. He is currently a second year Undergraduate Student and is majoring in Computer Science and Engineering. He likes to study Image Processing and Computer Vision. He is also a very active photographer, likes to play football a lot, read books, poetry and make short films once in a while. He is very fond of Mountaineering, Trekking, Mountain Biking, Skiing, Design, Reading Books and Skateboarding and is trying competitive swimming right now. That's is for today,                           And Let's Repeat ...";
   String SPLIT_TOKENS = " ?;:[]<>()\"";
   String words[];
   int charIndex = 0;
